@@ -1,97 +1,96 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stock Lab</title>
-    <script>
-      (() => {
-        const stored = localStorage.getItem('theme');
-        const theme = stored || 'dark';
-        document.documentElement.dataset.theme = theme;
-      })();
-    </script>
-    <link rel="stylesheet" href="/styles.css" />
-    <script src="/vendor/klinecharts.min.js"></script>
-  </head>
-  <body>
-    <div class="app">
-      <header class="top-bar">
-        <div class="symbol">
-          <div class="symbol-name">STOCK</div>
-          <div class="symbol-price" id="symbol-price">$--</div>
-          <div class="symbol-change" id="symbol-change">--</div>
-        </div>
-        <div class="timeframes" id="timeframes">
-          <button type="button" data-range="1D" class="active">1D</button>
-          <button type="button" data-range="5D">5D</button>
-          <button type="button" data-range="1M">1M</button>
-          <button type="button" data-range="6M">6M</button>
-          <button type="button" data-range="YTD">YTD</button>
-          <button type="button" data-range="1Y">1Y</button>
-          <button type="button" data-range="MAX">Max</button>
-        </div>
-        <div class="header-actions">
-          <button type="button" class="ghost" id="theme-toggle">Theme</button>
-          <button type="button" class="ghost" id="fullscreen-toggle">Fullscreen</button>
-        </div>
-      </header>
 
-      <section class="toolbar">
-        <div class="toolbar-group">
-          <label class="field">
-            <span>Chart</span>
-            <select id="chart-type">
-              <option value="candle" selected>Candles</option>
-              <option value="line">Line</option>
-              <option value="area">Area</option>
-              <option value="ohlc">OHLC</option>
-            </select>
-          </label>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Lab</title>
+  <script>
+    (() => {
+      const stored = localStorage.getItem('theme');
+      const theme = stored || 'dark';
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/vendor/klinecharts.min.js"></script>
+</head>
 
-        <div class="toolbar-group">
-          <details class="dropdown" id="indicator-menu">
-            <summary>Indicators</summary>
-            <div class="menu">
-              <label><input type="checkbox" data-indicator="sma" /> SMA</label>
-              <label><input type="checkbox" data-indicator="ema" /> EMA</label>
-              <label><input type="checkbox" data-indicator="boll" /> Bollinger</label>
-              <label><input type="checkbox" data-indicator="rsi" /> RSI</label>
-              <label><input type="checkbox" data-indicator="macd" /> MACD</label>
-              <label><input type="checkbox" data-indicator="stochastic" /> Stochastic</label>
-            </div>
-          </details>
-        </div>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <div class="symbol">
+        <div class="symbol-name">STOCK</div>
+        <div class="symbol-price" id="symbol-price">$--</div>
+        <div class="symbol-change" id="symbol-change">--</div>
+      </div>
+      <div class="timeframes" id="timeframes">
+        <button type="button" data-range="1D" class="active">1D</button>
+        <button type="button" data-range="5D">5D</button>
+        <button type="button" data-range="1M">1M</button>
+        <button type="button" data-range="6M">6M</button>
+        <button type="button" data-range="YTD">YTD</button>
+        <button type="button" data-range="1Y">1Y</button>
+        <button type="button" data-range="MAX">Max</button>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="theme-toggle">Theme</button>
+        <button type="button" class="ghost" id="fullscreen-toggle">Fullscreen</button>
+      </div>
+    </header>
 
-        <div class="toolbar-group">
-          <details class="dropdown" id="draw-menu">
-            <summary>Draw</summary>
-            <div class="menu">
-              <button type="button" data-draw="segment">Trend Line</button>
-              <button type="button" data-draw="horizontalLine">Horizontal Line</button>
-              <button type="button" data-draw="verticalLine">Vertical Line</button>
-              <button type="button" data-draw="fibonacciLine">Fibonacci</button>
-              <button type="button" data-draw="parallelLine">Price Channel</button>
-              <button type="button" data-draw="rect">Rectangle</button>
-              <button type="button" data-draw="text">Text</button>
-            </div>
-          </details>
-          <button type="button" class="ghost" id="save-drawings">Save Drawings</button>
-        </div>
+    <section class="toolbar">
+      <div class="toolbar-group">
+        <label class="field">
+          <span>Chart</span>
+          <select id="chart-type">
+            <option value="candle" selected>Candles</option>
+            <option value="line">Line</option>
+            <option value="area">Area</option>
+            <option value="ohlc">OHLC</option>
+          </select>
+        </label>
+      </div>
 
-        <div class="toolbar-group">
-          <button type="button" class="ghost" id="upload-trigger">Upload CSV</button>
-          <input type="file" id="csv-upload" accept=".csv" hidden />
-        </div>
-      </section>
+      <div class="toolbar-group">
+        <details class="dropdown" id="indicator-menu">
+          <summary>Indicators</summary>
+          <div id="indicator-list" class="menu">
+            <!-- Indicators will be injected here by plugins.js -->
+          </div>
+        </details>
+      </div>
 
-      <main class="chart-area">
-        <div id="chart" class="chart"></div>
-        <div id="chart-status" class="chart-status" role="status"></div>
-      </main>
-    </div>
+      <div class="toolbar-group">
+        <details class="dropdown" id="draw-menu">
+          <summary>Draw</summary>
+          <div class="menu">
+            <button type="button" data-draw="segment">Trend Line</button>
+            <button type="button" data-draw="horizontalLine">Horizontal Line</button>
+            <button type="button" data-draw="verticalLine">Vertical Line</button>
+            <button type="button" data-draw="fibonacciLine">Fibonacci</button>
+            <button type="button" data-draw="parallelLine">Price Channel</button>
+            <button type="button" data-draw="rect">Rectangle</button>
+            <button type="button" data-draw="text">Text</button>
+          </div>
+        </details>
+        <button type="button" class="ghost" id="save-drawings">Save Drawings</button>
+      </div>
 
-    <script src="/app.js"></script>
-  </body>
+      <div class="toolbar-group">
+        <button type="button" class="ghost" id="upload-trigger">Upload CSV</button>
+        <input type="file" id="csv-upload" accept=".csv" hidden />
+      </div>
+    </section>
+
+    <main class="chart-area">
+      <div id="chart" class="chart"></div>
+      <div id="chart-status" class="chart-status" role="status"></div>
+    </main>
+  </div>
+
+  <script type="module" src="/plugins.js"></script>
+  <script type="module" src="/app.js"></script>
+</body>
+
 </html>

@@ -1,3 +1,5 @@
+import { IndicatorRegistry } from './plugins.js';
+
 const statusEl = document.getElementById('chart-status');
 
 if (!window.klinecharts) {
@@ -6,6 +8,23 @@ if (!window.klinecharts) {
 }
 
 const chart = klinecharts.init('chart');
+// Initialize Registry
+const registry = new IndicatorRegistry(chart, 'indicator-list');
+
+// Register Default Plugins
+registry.register({ id: 'sma', name: 'MA', pane: 'candle_pane' });
+registry.register({ id: 'ema', name: 'EMA', pane: 'candle_pane' });
+registry.register({ id: 'boll', name: 'BOLL', pane: 'candle_pane' });
+registry.register({ id: 'rsi', name: 'RSI', pane: 'indicator_pane' });
+registry.register({ id: 'macd', name: 'MACD', pane: 'indicator_pane' });
+registry.register({ id: 'stochastic', name: 'KDJ', pane: 'indicator_pane' });
+
+// Set default indicator
+registry.toggle('volume', true); // Custom handling for volume? Or just let it be.
+// Original code did: chart.createIndicator('VOL', false, { id: 'volume_pane' });
+// We can just keep that or make it a plugin too. Let's keep it manual for now to match exact behavior, or better yet, make it a plugin?
+// The original code had: chart.createIndicator('VOL', false, { id: 'volume_pane' });
+// It wasn't in the menu. I'll leave it as is.
 chart.createIndicator('VOL', false, { id: 'volume_pane' });
 
 const priceEl = document.getElementById('symbol-price');
@@ -19,16 +38,6 @@ const uploadInput = document.getElementById('csv-upload');
 const saveDrawingsButton = document.getElementById('save-drawings');
 
 let latestTimestamp = null;
-
-const indicatorState = {};
-const indicatorConfig = {
-  sma: { name: 'MA', pane: 'candle_pane' },
-  ema: { name: 'EMA', pane: 'candle_pane' },
-  boll: { name: 'BOLL', pane: 'candle_pane' },
-  rsi: { name: 'RSI', pane: 'indicator_pane' },
-  macd: { name: 'MACD', pane: 'indicator_pane' },
-  stochastic: { name: 'KDJ', pane: 'indicator_pane' },
-};
 
 function parseTimestamp(value) {
   if (!value) {
@@ -140,36 +149,6 @@ async function loadCandles(range) {
   updateHeader(candles);
 }
 
-function toggleIndicator(key, enabled) {
-  const config = indicatorConfig[key];
-  if (!config) {
-    return;
-  }
-  if (enabled) {
-    if (indicatorState[key]) {
-      return;
-    }
-    const id = chart.createIndicator(config.name, false, { id: config.pane });
-    indicatorState[key] = { id, pane: config.pane };
-  } else {
-    const existing = indicatorState[key];
-    if (!existing || typeof chart.removeIndicator !== 'function') {
-      indicatorState[key] = null;
-      return;
-    }
-    try {
-      chart.removeIndicator(existing.id, existing.pane);
-    } catch (error) {
-      try {
-        chart.removeIndicator(existing.id);
-      } catch (err) {
-        console.warn('Failed to remove indicator', err);
-      }
-    }
-    indicatorState[key] = null;
-  }
-}
-
 function setChartType(type) {
   if (typeof chart.setStyles !== 'function') {
     return;
@@ -276,12 +255,6 @@ async function init() {
   }
 }
 
-Array.from(document.querySelectorAll('[data-indicator]')).forEach((input) => {
-  input.addEventListener('change', (event) => {
-    toggleIndicator(event.target.dataset.indicator, event.target.checked);
-  });
-});
-
 Array.from(document.querySelectorAll('[data-draw]')).forEach((button) => {
   button.addEventListener('click', () => {
     startDrawing(button.dataset.draw);
@@ -351,3 +324,4 @@ uploadInput.addEventListener('change', async () => {
 
 applyTheme(document.documentElement.dataset.theme || 'dark');
 init();
+
